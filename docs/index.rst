@@ -22,10 +22,10 @@ Grid types
 
 As of Landlab version 0.2, there are four types of Landlab grid:
 
--  Raster
--  Voronoi-Delaunay
--  Hex
--  Radial
+-  :ref:`Raster <Raster>`
+-  :ref:`Voronoi-Delaunay <Voronoi>`
+-  :ref:`Hex <Hex>`
+-  :ref:`Radial <Radial>`
 
 The base class is `ModelGrid` with subclasses `RasterModelGrid` and
 `VoronoiDelaunayGrid`.
@@ -43,7 +43,6 @@ Methods and properties common to all grids
    landlab.grid.mappers
    landlab.grid.gradients
    landlab.grid.divergence
-   landlab.grid.grid_funcs
    landlab.grid.create
    landlab.grid.decorators
 
@@ -273,7 +272,7 @@ References
 * :ref:`search`
 
 
-Search the Index
-==================
+.. Search the Index
+.. ==================
 
-* :ref:`genindex`
+.. * :ref:`genindex`
