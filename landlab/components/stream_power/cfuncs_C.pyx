@@ -162,7 +162,10 @@ def erode_with_link_alpha_fixthresh(np.ndarray[DTYPE_INT_t, ndim=1] src_nodes,
             while True:
 
                 z_diff = next_z - z[dst_id]
-                f = alpha[src_id] * pow(z_diff, n - 1.)
+                if z_diff < 0:
+                    f = 0
+                else:
+                    f = alpha[src_id] * pow(z_diff, n - 1.)
                 excess_thresh = f * z_diff - threshxdt
                 if excess_thresh < 0.:
                     excess_thresh = 0.
@@ -170,11 +173,13 @@ def erode_with_link_alpha_fixthresh(np.ndarray[DTYPE_INT_t, ndim=1] src_nodes,
                                    (1. + n * f))
                 if next_z < z[dst_id]:
                    next_z = z[dst_id] + 1.e-15  # maintain connectivity
-                if next_z != 0.:
-                    if fabs((next_z - prev_z)/next_z) < 1.48e-08 or n == 1.:
+                if not next_z == 0.:
+                    if n == 1:
                         break
-                else:
-                    break
+                    elif fabs((next_z - prev_z)/next_z) < 1.48e-08 or (fabs(next_z - prev_z) < 1.48e-08):
+                        break
+                    else:
+                        break
 
                 prev_z = next_z;
 
