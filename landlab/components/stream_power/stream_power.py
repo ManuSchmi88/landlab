@@ -302,7 +302,7 @@ class StreamPowerEroder(Component):
             assert (float(m_sp) >= 0.) and (float(n_sp) >= 0.), \
                 "m and n must be positive"
             self._m = float(m_sp)
-            print("Assert self._n")
+            #print("Assert self._n")
             self._n = float(n_sp)
             assert ((a_sp is None) and (b_sp is None) and (c_sp is None)), (
                 "If sp_type is 'set_mn', do not pass values for a, b, or c!")
