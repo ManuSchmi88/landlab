@@ -302,6 +302,7 @@ class StreamPowerEroder(Component):
             assert (float(m_sp) >= 0.) and (float(n_sp) >= 0.), \
                 "m and n must be positive"
             self._m = float(m_sp)
+            #print("Assert self._n")
             self._n = float(n_sp)
             assert ((a_sp is None) and (b_sp is None) and (c_sp is None)), (
                 "If sp_type is 'set_mn', do not pass values for a, b, or c!")
@@ -354,6 +355,8 @@ class StreamPowerEroder(Component):
               link_slopes=None, slopes_from_elevs=None,
               W_if_used=None, Q_if_used=None, K_if_used=None,
               flooded_nodes=None):
+
+        #print("Start Eroding Algo.")
         """
         .. note:: deprecated
             This run method is now DEPRECATED. Use the fully standardized
@@ -509,16 +512,20 @@ class StreamPowerEroder(Component):
             reversed_flow = node_z < node_z[flow_receivers]
             # this check necessary if flow has been routed across
             # depressions
+            #print("Calc alpha divided.")
             self.alpha[reversed_flow] = 0.
             self.alpha_divided[defined_flow_receivers] = (
                 self.alpha[defined_flow_receivers] /
                 flow_link_lengths**(self._n - 1.))
+            #print("flow_link_lengths**(self._n -1)")
             threshdt = self.sp_crit * dt
             if type(threshdt) is float:
+                #print("call c-func")
                 erode_with_link_alpha_fixthresh(upstream_order_IDs,
                                                 flow_receivers,
                                                 threshdt, self.alpha_divided,
                                                 self._n, node_z)
+                #print("finish c-func")
             else:
                 erode_with_link_alpha_varthresh(upstream_order_IDs,
                                                 flow_receivers,
@@ -662,6 +669,7 @@ class StreamPowerEroder(Component):
 
         return grid, node_z, self.stream_power_erosion
 
+        #print("end of erosion algo")
     def run_one_step(self, dt, flooded_nodes=None, **kwds):
         """
         A simple, explicit implementation of a stream power algorithm.
