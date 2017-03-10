@@ -106,13 +106,13 @@ vegi_perc = mg.zeros('node',dtype=float)
 #vegi_trace_x = mg.x_of_node / 2
 #more_vegi = np.where(mg.x_of_node >= vegi_trace_x)
 #less_vegi = np.where(mg.x_of_node < vegi_trace_x)
-vegi_perc[less_vegi] += 0.4
-vegi_perc[more_vegi] += 0.4
+#vegi_perc[less_vegi] += 0.4
+#vegi_perc[more_vegi] += 0.4
 vegi_test_timeseries = (np.sin(0.00015*timeVec)+1)/2
 
 #Do the K-field vegetation-dependend calculations
 #Calculations after Istanbulluoglu
-vegi_perc = np.random.rand(z.size)/100
+vegi_perc += np.random.rand(z.size)/100
 vegi_perc += vegi_test_timeseries[int(elapsed_time/dt)-1]
 vegi_perc.clip(0.,1.)
 
@@ -293,7 +293,7 @@ axarr[2].plot(timeVec, np.degrees(np.arctan(max_slope)), 'r--', linewidth = 2.0,
 axarr[2].plot(timeVec, np.degrees(np.arctan(min_slope)), 'r--', linewidth = 2.0, alpha = 0.5)
 #axarr[2].set_ylim([0,10])
 axarr[2].set_title('Mean Slope', fontsize = 12)
-axarr[2].set_ylabel('Mean Slope [°]')
+axarr[2].set_ylabel('Mean Slope [deg]')
 axarr[3].plot(timeVec,mean_dd, 'b', linewidth = 2.5)
 axarr[3].set_title('Mean Drainage Density')
 axarr[3].set_ylabel('Drainage Density')
