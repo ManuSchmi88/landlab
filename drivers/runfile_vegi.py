@@ -117,7 +117,7 @@ vegi_perc += vegi_test_timeseries[int(elapsed_time/dt)-1]
 vegi_perc.clip(0.,1.)
 
 #nSoil_to_15 = np.power(n_soil, 1.5)
-#Ford = AqDens * grav * nSoil_to_15
+Ford = AqDens * grav * nSoil_to_15
 n_v_frac = n_soil + (n_VRef*(vegi_perc/v_ref)) #self.vd = VARIABLE!
 n_v_frac_to_w = np.power(n_v_frac, w)
 Prefect = np.power(n_v_frac_to_w, 0.9)
@@ -157,7 +157,7 @@ print("finished initiation of eroding components. starting loop...")
 while elapsed_time < total_T1:
 
     #create copy of "old" topography
-    z0 = mg.at_node['topographic__elevation'][mg.core_nodes].copy()
+    z0 = mg.at_node['topographic__elevation'].copy()
 
     #Call the erosion routines.
     fr.route_flow()
@@ -171,20 +171,20 @@ while elapsed_time < total_T1:
     mean_dd.append(dd.calc_drainage_density())
 
     #Calculate dhdt and E
-    dh = (mg.at_node['topographic__elevation'][mg.core_nodes] - z0)
+    dh = (mg.at_node['topographic__elevation'] - z0)
     dhdt = dh/dt
     erosionMatrix = uplift_rate - dhdt
     meanE.append(np.mean(erosionMatrix))
 
     #Calculate river erosion rate, based on critical area threshold
-    dh_riv = mg.at_node['topographic__elevation'][np.where(mg.at_node['drainage_area'] <= 100000)]\
-        - z0[np.where(mg.at_node['drainage_area'] <= 100000)]
+    dh_riv = mg.at_node['topographic__elevation'][np.where(mg.at_node['drainage_area'] <= crit_area)]\
+        - z0[np.where(mg.at_node['drainage_area'] <= crit_area)]
     dhdt_riv = dh_riv/dt
     mean_riv_E.append(np.mean(uplift_rate - dhdt_riv))
 
     #Calculate hillslope erosion rate
-    dh_hill = mg.at_node['topographic__elevation'][np.where(mg.at_node['drainage_area'] <= 100000)]\
-        - z0[np.where(mg.at_node['drainage_area'] <= 100000)]
+    dh_hill = mg.at_node['topographic__elevation'][np.where(mg.at_node['drainage_area'] <= crit_area)]\
+        - z0[np.where(mg.at_node['drainage_area'] <= crit_area)]
     dhdt_hill = dh_hill/dt
     mean_hill_E.append(np.mean(uplift_rate - dhdt_hill))
 
