@@ -19,14 +19,14 @@ import time
 
 #-----------DOMAIN---------------#
 
-ncols = 301
-nrows = 301
+ncols = 601
+nrows = 601
 dx    = 100
 
 #------------TIME----------------#
 
 #runtime
-total_T1 = 1e5  #yrs.
+total_T1 = 1e6  #yrs.
 #timestep
 dt = 100        #yrs
 #number of timesteps and fillfactor for ffmpeg printout
@@ -46,10 +46,10 @@ uplift_per_step = uplift_rate * dt
 
 #-------------EROSION------------#
 
-Ksp = 1e-7
+Ksp = 1e-5
 msp  = 0.6
 nsp  = 1.0
-ldib   = 1e-5
+ldib   = 1e-2
 #time
 elapsed_time = 0
 
@@ -68,7 +68,7 @@ w      = 1.    #Some scaling factor for vegetation [-?]
 
 dhdtA    = [] #Vector containing dhdt values for each node per timestep
 meandhdt = [] #contains mean elevation change per timestep
-meanE    = [] #contains the mean "erosion" rate out of Massbalance
+mean_E    = [] #contains the mean "erosion" rate out of Massbalance
 mean_hill_E = [] #contains mean hillslope erosion rate
 mean_riv_E  = [] #contains mean river erosion rate
 mean_dd = [] #contains mean drainage density
@@ -108,15 +108,15 @@ vegi_perc = mg.zeros('node',dtype=float)
 #less_vegi = np.where(mg.x_of_node < vegi_trace_x)
 #vegi_perc[less_vegi] += 0.4
 #vegi_perc[more_vegi] += 0.4
-vegi_test_timeseries = (np.sin(0.00015*timeVec)+1)/2
+vegi_timeseries = (np.sin(0.00015*timeVec)+1)/2
 
 #Do the K-field vegetation-dependend calculations
 #Calculations after Istanbulluoglu
 vegi_perc += np.random.rand(z.size)/100
-vegi_perc += vegi_test_timeseries[int(elapsed_time/dt)-1]
+vegi_perc += vegi_timeseries[int(elapsed_time/dt)-1]
 vegi_perc.clip(0.,1.)
 
-#nSoil_to_15 = np.power(n_soil, 1.5)
+nSoil_to_15 = np.power(n_soil, 1.5)
 Ford = AqDens * grav * nSoil_to_15
 n_v_frac = n_soil + (n_VRef*(vegi_perc/v_ref)) #self.vd = VARIABLE!
 n_v_frac_to_w = np.power(n_v_frac, w)
@@ -174,7 +174,7 @@ while elapsed_time < total_T1:
     dh = (mg.at_node['topographic__elevation'] - z0)
     dhdt = dh/dt
     erosionMatrix = uplift_rate - dhdt
-    meanE.append(np.mean(erosionMatrix))
+    mean_E.append(np.mean(erosionMatrix))
 
     #Calculate river erosion rate, based on critical area threshold
     dh_riv = mg.at_node['topographic__elevation'][np.where(mg.at_node['drainage_area'] <= crit_area)]\
@@ -190,7 +190,7 @@ while elapsed_time < total_T1:
 
     #update vegetation__density
     vegi_perc = np.random.rand(z.size)/100
-    vegi_perc += vegi_test_timeseries[int(elapsed_time/dt)-1]
+    vegi_perc += vegi_timeseries[int(elapsed_time/dt)-1]
 
     #update lin_diff
     lin_diff = ldib*np.exp(-vegi_perc)
@@ -268,7 +268,7 @@ ax1.plot(timeVec, mean_hill_E, 'k', alpha = 0.6, linewidth = 2.5)
 ax1.plot(timeVec, mean_riv_E, 'k--', alpha = 0.6, linewidth = 2.5)
 #ax1.set_ylim([uplift_rate*0.9,uplift_rate*1.1])
 ax1.plot(timeVec, mean_E, 'r', linewidth = 4.7)
-ax2.plot(timeVec,100*vegi_test_timeseries,'g', linewidth = 4)
+ax2.plot(timeVec,100*vegi_timeseries,'g', linewidth = 4)
 #ax2.set_ylim([0,100])
 ax1.set_xlabel('years', fontsize = 22)
 ax1.set_ylabel('Erosion rate', color='k', fontsize = 22)
@@ -279,7 +279,7 @@ plt.savefig('./VegiEros_dualy.png',dpi = 720)
 
 #Plot Vegi_erosion_rate
 fig, axarr = plt.subplots(5, sharex = True, figsize = [11,14])
-axarr[0].plot(timeVec, vegi_test_timeseries,'g', linewidth = 2.5)
+axarr[0].plot(timeVec, vegi_timeseries,'g', linewidth = 2.5)
 axarr[0].set_title('Mean Surface Vegetation', fontsize = 12)
 axarr[0].set_ylabel('Vegetation cover')
 axarr[1].plot(timeVec, mean_elev, 'k', linewidth = 2.5)
@@ -304,24 +304,39 @@ axarr[4].legend(['Hillsl.', 'Rivers','Mean'])
 axarr[4].set_title("Erosion rates")
 axarr[4].set_ylabel('Erosion rate [m/yr]')
 axarr[4].set_xlabel('Model Years', fontsize = 12)
-plt.savefig('./Multiplot.png',dpi = 720)
+plt.savefig('./Multiplot_absolut.png',dpi = 720)
 
-#Normalized Plot
-mean_E_norm = mean_E/np.max(mean_E)
-mean_riv_E_norm = mean_riv_E/np.max(mean_riv_E)
-mean_hill_E_norm = mean_hill_E/np.max(mean_hill_E)
-mean_elev_norm = mean_elev/np.max(mean_elev)
-mean_slope_norm = mean_slope/np.max(mean_slope)
-mean_dd_norm = mean_dd/np.max(mean_dd)
-fig, ax = plt.subplots(figsize = [11,7])
-ax.plot(timeVec,vegi_test_timeseries, 'g--', linewidth = 5, alpha = 0.6)
-#ax.plot(timeVec,mean_E_norm,'r--', linewidth = 5)
-#ax.plot(timeVec,mean_elev_norm, 'k', linewidth = 5)
-ax.plot(timeVec,mean_slope_norm, 'b', linewidth = 5, alpha = 0.7)
-ax.plot(timeVec, mean_dd_norm, 'm', linewidth = 5)
-#ax.legend(["Vegetation", "Erosion", "Elevation", "Slope", "Drainage Density"])
-ax.legend(['Vegetation', 'Slope', 'Drainage Density'])
+#Multiplot with normalized differentations
+vegi_timeseries_diff = np.diff(vegi_timeseries)/(np.max(np.diff(vegi_timeseries)))
+mean_elev_diff = np.diff(mean_elev)/(np.max(np.abs((np.diff(mean_elev)))))
+mean_slope_diff = np.diff(mean_slope)/(np.max(np.abs(np.diff(mean_slope))))
+mean_hill_E_diff = np.diff(mean_hill_E)/(np.max(np.abs(np.diff(mean_hill_E))))
+mean_riv_E_diff = np.diff(mean_riv_E)/(np.max(np.abs(np.diff(mean_riv_E))))
+mean_E_diff = np.diff(mean_E)/np.max(np.abs(np.diff(mean_E)))
+mean_dd_diff = np.diff(mean_dd)/np.max(np.abs(np.diff(mean_dd)))
+timeVec_diff = np.delete(timeVec, -1)
 
-#Plot
+fig, axarr = plt.subplots(5, sharex = True, figsize = [11,14])
+axarr[0].plot(timeVec_diff, vegi_timeseries_diff,'g', linewidth = 2.5)
+axarr[0].plot(timeVec,vegi_timeseries,'g--',alpha=0.5)
+axarr[0].set_title('Change In Mean Surface Vegetation', fontsize = 12)
+axarr[0].set_ylabel('Vegetation cover change')
+axarr[1].plot(timeVec_diff, mean_elev_diff, 'k', linewidth = 2.5)
+axarr[1].set_title('Change In Mean Elevation', fontsize = 12)
+axarr[1].set_ylabel('dh/dt')
+axarr[2].plot(timeVec_diff, mean_slope_diff, 'r', linewidth = 2.5)
+axarr[2].set_title('Change In Mean Slope', fontsize = 12)
+axarr[2].set_ylabel('dS/dt')
+axarr[3].plot(timeVec_diff,mean_dd_diff, 'b', linewidth = 2.5)
+axarr[3].set_title('Change In Mean Drainage Density')
+axarr[3].set_ylabel('d(dd)/dt')
+#axarr[4].plot(timeVec_diff, mean_hill_E_diff, 'g--', linewidth = 2.0, alpha = 0.5)
+#axarr[4].plot(timeVec_diff, mean_riv_E_diff, 'b--', linewidth = 2.0, alpha = 0.5)
+axarr[4].plot(timeVec_diff, mean_E_diff, 'r--', linewidth = 2.2, alpha = 0.8)
+#axarr[4].legend(['Hillsl.', 'Rivers','Mean'])
+axarr[4].set_title("Change In Erosion Rates")
+axarr[4].set_ylabel('dE/dt')
+axarr[4].set_xlabel('Model Years', fontsize = 12)
+plt.savefig('./Multiplot_diff.png',dpi = 720)
 
 print("FINALLY! TADA! IT IS DONE! LOOK AT ALL THE OUTPUT I MADE!!!!")

@@ -15,7 +15,8 @@
 #SBATCH -N 1
 
 ##Set the correct python PATH variables
-LANDLABWRKDIR=/esd/esd/data/mschmid/model_runs/runningSimus
+#LANDLABWRKDIR=/esd/esd/data/mschmid/model_runs/runningSimus
+LANDLABWRKDIR=$(pwd)
 PYTHONBIN=/esd/esd/data/mschmid/anaconda3/bin
 
 ##Set up correct folder structure
@@ -24,7 +25,9 @@ if [ ! -d ACC ] ; then mkdir ACC ; fi
 if [ ! -d DHDT ] ; then mkdir DHDT ; fi
 if [ ! -d NC ] ; then mkdir NC ; fi
 if [ ! -d SA ] ; then mkdir SA ; fi
+if [ ! -d dd ] ; then mkdir dd ; fi
 
 ##Run Landlab
 
-${PYTHONBIN}/python ${LANDLABWRKDIR}/const_thsp_simu/runfile.py
+#${PYTHONBIN}/python ${LANDLABWRKDIR}/const_thsp_simu/runfile.py
+${PYTHONBIN}/python ${LANDLABWRKDIR}/runfile_vegi.py
