@@ -41,7 +41,7 @@ zp = len(str(int(no)))
 
 #------------UPLIFT--------------#
 
-uplift_rate = 1e-4 #m/yr = 0.0001m/yr = 1mm/yr
+uplift_rate = 5e-4 #m/yr = 0.0001m/yr = 1mm/yr
 uplift_per_step = uplift_rate * dt
 
 #-------------EROSION------------#
@@ -135,7 +135,10 @@ lin_diff = ldib*np.exp(-vegi_perc)
 print("Finished setting up the vegetation field and K and LD fields.")
 
 #Create Threshold_sp field CURRENTLY NOT WORKING!
-threshold_arr  = 2
+#Threshold_arr is float
+
+threshold_arr  = 2000.
+
 #threshold_arr += 3e-5
 #threshold_arr[np.where(mg.x_of_node >= 30000)] += 3e-5
 #threshold_field = mg.add_field('node','threshold_sp',threshold_arr,noclobber = False)
@@ -338,5 +341,16 @@ axarr[4].set_title("Change In Erosion Rates")
 axarr[4].set_ylabel('dE/dt')
 axarr[4].set_xlabel('Model Years', fontsize = 12)
 plt.savefig('./Multiplot_diff.png',dpi = 720)
+
+
+#Save the most useful output arrays as CSV file for later plotting
+np.savetxt('./CSVOutput/MeanSlope.csv', mean_slope)
+np.savetxt('./CSVOutput/MaxElev.csv', max_slope)
+np.savetxt('./CSVOutput/MeanElev.csv', mean_elev)
+np.savetxt('./CSVOutput/MaxElev.csv', max_elev)
+np.savetxt('./CSVOutput/MeanRiverErosion.csv', mean_riv_E)
+np.savetxt('./CSVOutput/MeanHillslopeErosion.csv', mean_hill_E)
+np.savetxt('./CSVOutput/MeanErosion.csv', mean_E)
+np.savetxt('./CSVOutput/VegetationDensity.csv', vegi_timeseries)
 
 print("FINALLY! TADA! IT IS DONE! LOOK AT ALL THE OUTPUT I MADE!!!!")
