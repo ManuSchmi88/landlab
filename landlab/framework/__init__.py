@@ -1,3 +1,0 @@
-"""
-The Landlab modeling framework.
-"""
