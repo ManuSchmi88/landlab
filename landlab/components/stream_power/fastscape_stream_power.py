@@ -263,13 +263,13 @@ class FastscapeEroder(Component):
                 self._r_i = None
             else:
                 self._r_i = self._grid.at_node[rainfall_intensity]
-        elif type(rainfall_intensity) in (float, int):  # a float
+        elif type(rainfall_intensity) in (numpy.float64, numpy.int):  # a float
             self._r_i = float(rainfall_intensity)
-        elif len(rainfall_intensity) == self.grid.number_of_nodes:
-            raise ValueError('This component can no longer handle ' +
-                             'spatially variable rainfall. Use ' +
-                             'StreamPowerEroder.')
-            self._r_i = numpy.array(rainfall_intensity)
+        #elif len(rainfall_intensity) == self.grid.number_of_nodes:
+        #    raise ValueError('This component can no longer handle ' +
+        #                     'spatially variable rainfall. Use ' +
+        #                     'StreamPowerEroder.')
+        #    self._r_i = numpy.array(rainfall_intensity)
         else:
             raise TypeError('Supplied type of rainfall_' +
                             'intensity was not recognised!')
